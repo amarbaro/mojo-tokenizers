@@ -39,10 +39,11 @@ _bs = [*range(33, 127), *range(161, 173), *range(174, 256)]
 _u = {c: c for c in _bs}
 _u.update({b: 256 + i for i, b in enumerate(b for b in range(256) if b not in _bs)})
 _inv = {chr(c): b for b, c in _u.items()}
-_vocab = sorted(doc["model"]["vocab"])
+_uni = isinstance(doc["model"]["vocab"], list)  # Unigram: [[token, score], ...]
+_vocab = [t for t, _ in doc["model"]["vocab"]] if _uni else sorted(doc["model"]["vocab"])
 def word():  # the text of a random vocabulary entry (skips entries that are not whole UTF-8 characters)
     while True:
-        try: return bytes(_inv[c] for c in rnd.choice(_vocab)).decode()
+        try: return rnd.choice(_vocab).replace("\u2581", " ") if _uni else bytes(_inv[c] for c in rnd.choice(_vocab)).decode()
         except (KeyError, UnicodeDecodeError): pass
 def vocab(): return "".join(word() + rnd.choice(["", " ", "\n"]) for _ in range(rnd.randint(1, 4)))
 def long_(): return rnd.choice(["a", "ab", "一", " ", "1", "!!", "\U0001F600"]) * rnd.randint(200, 3000)

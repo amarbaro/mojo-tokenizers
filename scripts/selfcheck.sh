@@ -4,13 +4,16 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ROOT=$PWD
 mutants=(
-  $'src/tokenizers/tokenizer.mojo\tself.ignore_merges = ig >= 0 and j.n[ig].num != 0\tself.ignore_merges = False\tignore_merges not honoured'
+  $'src/tokenizers/tokenizer.mojo\tself.ignore_merges = _n(j, _at(j, 0, "model/ignore_merges")) != 0\tself.ignore_merges = False\tignore_merges not honoured'
   $'src/tokenizers/tokenizer.mojo\tif b < 33 or (b > 126 and b < 161) or b == 173:\tif b < 33 or (b > 126 and b < 161):\tbyte alphabet wrong'
-  $'src/tokenizers/tokenizer.mojo\tand heap[l] < heap[s]:\tand heap[l] > heap[s]:\thighest rank merged first'
+  $'src/tokenizers/tokenizer.mojo\tand heap[c] < heap[s]:\tand heap[c] > heap[s]:\thighest rank merged first'
   $'src/tokenizers/tokenizer.mojo\t?\\\\p{N}+| ?[^\t?\\\\p{N}| ?[^\tGPT-2 pattern splits digits'
-  $'src/tokenizers/tokenizer.mojo\tfor p in self.starts[Int(b[i])]:\tfor p in List[Int]():\tadded tokens not cut out'
-  $'src/tokenizers/tokenizer.mojo\tif self.norm & 4 != 0 and cp >= 128:\tif False and cp >= 128:\tstrip_accents not applied'
-  $'src/tokenizers/tokenizer.mojo\tvar bad = n > self.max_chars\tvar bad = False\tmax_input_chars_per_word ignored'
+  $'src/tokenizers/tokenizer.mojo\tfor p in range(len(self.specials)):\tfor p in range(0):\tadded tokens not cut out'
+  $'src/tokenizers/tokenizer.mojo\telif self.norm & 4 != 0 and _in(MARKS, cp):\telif False and _in(MARKS, cp):\tstrip_accents not applied'
+  $'src/tokenizers/tokenizer.mojo\tself.max_chars = _n(j, _at(j, model, "max_input_chars_per_word"))\tself.max_chars = 100000\tmax_input_chars_per_word ignored'
+  $'src/tokenizers/tokenizer.mojo\tif tid[e] != self.unk or len(ids) == 0 or ids[len(ids) - 1] != self.unk:\tif True:\tconsecutive unknowns not fused'
+  $'src/tokenizers/tokenizer.mojo\tg.byte_length() < 6\tg.byte_length() < 0\twhole-grapheme charsmap lookup dropped'
+  $'src/tokenizers/tokenizer.mojo\tself._seg(_trim(seg, False) if self.spf[hit] & 1 != 0 else seg^, out, rs)\tself._seg(seg^, out, rs)\tadded-token lstrip ignored'
 )
 for m in "${mutants[@]}"; do
   IFS=$'\t' read -r file from to why <<< "$m"

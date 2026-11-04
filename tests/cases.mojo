@@ -37,4 +37,4 @@ def main() raises:
             s += ("" if i == 0 else " ") + String(ids[i])
         print(s)
     if a[1] == "roundtrip":
-        print("roundtrip: skip (WordPiece lowercases)" if t.wp else "roundtrip: " + String(len(ls) - bad) + "/" + String(len(ls)))
+        print("roundtrip: skip (normalizes)" if t.kind != 0 else "roundtrip: " + String(len(ls) - bad) + "/" + String(len(ls)))
