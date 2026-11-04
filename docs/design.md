@@ -18,5 +18,14 @@ needs (control and punctuation ranges, canonical decompositions without marks, l
 the oracle Python (Unicode 16.0.0) into `src/tokenizers/bert_tables.mojo`, 41 KB, so nothing is read at run time but two small dicts
 built at load. Hangul syllables decompose in code. Unassigned code points are kept, as the crate keeps them (found by the gate).
 
-**Memory.** Peak RSS is the vocabulary: 26 MB (BERT), 35 MB (GPT-2), 61 MB (Qwen2.5), 76 MB (Llama 3) while encoding 1 MB, against the crate's
-34, 42, 84, 109 MB in Python. The file is read once, parsed in place and freed after load.
+**Unigram.** Viterbi over the vocabulary scores: for each end position, starts ascending, strict `>`, so ties go to the earliest start as in the crate's
+lattice; a character outside the vocabulary costs the lowest score minus 10; consecutive unknowns fuse into one id (the first gate run showed
+the crate emitting `3 2`, not `3 2 2 2 ...`, for a run of emoji). The `Precompiled` normalizer is the sentencepiece charsmap (base64,
+double-array trie, replacement pool). The crate does not run sentencepiece's longest match: a grapheme cluster under 6 bytes is looked up
+whole and takes its shortest trie match, anything else is looked up code point by code point with the longest (prototyped against the crate:
+3018 of 3018 samples, plain longest match 2755). Mojo's `String.graphemes()` supplies the clusters. Then `Replace` (regex), `WhitespaceSplit`,
+and `Metaspace`: spaces become U+2581, one is prepended, each U+2581 starts a piece. Added tokens with `lstrip`/`rstrip` (XLM-R `<mask>`) absorb
+the white space around them.
+
+**Memory.** Peak RSS is the vocabulary: 26 MB (BERT), 28 MB (T5), 35 MB (GPT-2), 61 MB (Qwen2.5), 76 MB (Llama 3), 90 MB (XLM-R) while encoding 1 MB, against the crate's
+34, 56, 42, 84, 109, 317 MB in Python. The file is read once, parsed in place and freed after load.
