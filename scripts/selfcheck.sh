@@ -9,6 +9,8 @@ mutants=(
   $'src/tokenizers/tokenizer.mojo\tand heap[l] < heap[s]:\tand heap[l] > heap[s]:\thighest rank merged first'
   $'src/tokenizers/tokenizer.mojo\t?\\\\p{N}+| ?[^\t?\\\\p{N}| ?[^\tGPT-2 pattern splits digits'
   $'src/tokenizers/tokenizer.mojo\tfor p in self.starts[Int(b[i])]:\tfor p in List[Int]():\tadded tokens not cut out'
+  $'src/tokenizers/tokenizer.mojo\tif self.norm & 4 != 0 and cp >= 128:\tif False and cp >= 128:\tstrip_accents not applied'
+  $'src/tokenizers/tokenizer.mojo\tvar bad = n > self.max_chars\tvar bad = False\tmax_input_chars_per_word ignored'
 )
 for m in "${mutants[@]}"; do
   IFS=$'\t' read -r file from to why <<< "$m"

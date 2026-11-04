@@ -7,6 +7,8 @@ from tokenizers import Tokenizer
 
 op, tok, path = sys.argv[1:4]
 t = Tokenizer.from_file(tok)
+t.no_truncation()
+t.no_padding()
 for line in open(path, encoding="utf-8"):
     if op == "encode":
         print(" ".join(map(str, t.encode(json.loads(line), add_special_tokens=False).ids)))
