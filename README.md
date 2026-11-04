@@ -1,21 +1,30 @@
 # mojo-tokenizers
 
+<!-- badges -->
+[![ci](https://github.com/amarbaro/mojo-tokenizers/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/amarbaro/mojo-tokenizers/actions/workflows/ci.yml) [![latest release](https://img.shields.io/github/v/release/amarbaro/mojo-tokenizers)](https://github.com/amarbaro/mojo-tokenizers/releases/latest) [![license](https://img.shields.io/github/license/amarbaro/mojo-tokenizers)](https://github.com/amarbaro/mojo-tokenizers/blob/main/LICENSE)
+<!-- /badges -->
+
 Hugging Face `tokenizer.json` runtime for Mojo: byte-level BPE (GPT-2, Llama 3, Qwen), WordPiece (BERT) and Unigram (T5, XLM-R). Ids are identical to the Python
 `tokenizers` crate's on 6 real tokenizer files x 2000 generated texts, and encoding runs 2 to 4 times faster than the crate through Python.
 
 ```mojo
-from std.sys import argv
+from std.os import remove
 from tokenizers import Tokenizer
 
 
 def main() raises:
-    var t = Tokenizer(String(argv()[1]))  # a BPE, WordPiece or Unigram tokenizer.json
-    var ids = t.encode("Hello, world!")
-    print(len(ids), "ids:", ids[0], ids[1], "...")
+    # A six-token WordPiece tokenizer.json written on the spot; a real one is a model's own file.
+    var spec = '{"model":{"type":"WordPiece","unk_token":"[UNK]","continuing_subword_prefix":"##","max_input_chars_per_word":100,"vocab":{"[UNK]":0,"hello":1,"world":2,",":3,"!":4,"##s":5}},"normalizer":{"type":"BertNormalizer","clean_text":true,"handle_chinese_chars":true,"strip_accents":null,"lowercase":true},"pre_tokenizer":{"type":"BertPreTokenizer"},"decoder":{"type":"WordPiece","prefix":"##","cleanup":true},"added_tokens":[]}'
+    with open("quickstart.json", "w") as f:
+        f.write(spec)
+    var t = Tokenizer("quickstart.json")
+    remove("quickstart.json")
+    var ids = t.encode("Hello, worlds!")
+    print(len(ids), "ids:", ids[0], ids[1], ids[2], ids[3], ids[4])
     print(t.decode(ids))
 ```
 
-Install: `git clone` this repo, then `mojo run -I mojo-tokenizers/src app.mojo` (Mojo 1.2). The example is `examples/quickstart.mojo`, run by the gate.
+Install: `git clone` this repo, then `mojo run -I mojo-tokenizers/src app.mojo` (Mojo 1.2). The example is `examples/quickstart.mojo`: it needs no arguments and no files, and the gate runs it.
 
 | tokenizer (encode 1 MB, ms) | Mojo | `tokenizers` crate |
 |---|---|---|

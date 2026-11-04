@@ -37,6 +37,7 @@ done
 echo "oracle: $nt tokenizers, $ni texts: ids and decodes identical to the crate"
 if [[ $CASES == .work/cases ]]; then
   $M run -I src tests/api.mojo 2>/dev/null || { echo "FAIL api: tests/api.mojo"; exit 1; }
-  $M run -I src examples/quickstart.mojo $F/gpt2.json 2>/dev/null | grep -q '^4 ids: 15947 11' || { echo "FAIL example: examples/quickstart.mojo"; exit 1; }
+  [[ $($M run -I src examples/quickstart.mojo 2>/dev/null) == $'5 ids: 1 3 2 5 4\nhello, worlds!' ]] || { echo "FAIL example: examples/quickstart.mojo"; exit 1; }
 fi
+python3 -I -c 'import re,sys; r=open("README.md").read(); m=re.search(r"```mojo\n(.*?)```", r, re.S); sys.exit(0 if m and m.group(1) == open("examples/quickstart.mojo").read() else 1)' || { echo "FAIL readme: the first README code block differs from examples/quickstart.mojo"; exit 1; }
 echo "PASS all"
