@@ -35,4 +35,8 @@ for name in $(awk '!/^#/ && NF {print $1}' tests/fixtures.txt); do
   nt=$((nt + 1))
 done
 echo "oracle: $nt tokenizers, $ni texts: ids and decodes identical to the crate"
+if [[ $CASES == .work/cases ]]; then
+  $M run -I src tests/api.mojo 2>/dev/null || { echo "FAIL api: tests/api.mojo"; exit 1; }
+  $M run -I src examples/quickstart.mojo $F/gpt2.json 2>/dev/null | grep -q '^4 ids: 15947 11' || { echo "FAIL example: examples/quickstart.mojo"; exit 1; }
+fi
 echo "PASS all"
