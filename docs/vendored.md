@@ -6,4 +6,4 @@ installed. Same license (Apache-2.0). Never edited here; sync by hand when a lib
 | Directory | Library | Version |
 |---|---|---|
 | `src/json` | mojo-json | 0.1.1+ (3908996) |
-| `src/uregex` | mojo-uregex | 0.3.1+ (0104174) |
+| `src/uregex` | mojo-uregex | 0.3.1+ (2ce35f9: `$` before a final newline, `\Z`, `\z`) |
