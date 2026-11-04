@@ -87,6 +87,14 @@ def _map(table: String) raises -> Dict[Int, List[Int]]:
     return out^
 
 
+def _sp(cp: Int) -> Bool:
+    return cp == 32 or (cp >= 9 and cp <= 13) or (cp >= 128 and _in(SPACE, cp))
+
+
+def _pu(cp: Int) -> Bool:
+    return (cp >= 33 and cp <= 47) or (cp >= 58 and cp <= 64) or (cp >= 91 and cp <= 96) or (cp >= 123 and cp <= 126) or (cp >= 128 and _in(PUNCT, cp))
+
+
 def _trim(s: String, left: Bool) -> String:
     """`s` without its leading (left) or trailing white space."""
     var cps = List[Int]()
@@ -94,9 +102,9 @@ def _trim(s: String, left: Bool) -> String:
         cps.append(Int(c))
     var a = 0
     var e = len(cps)
-    while left and a < e and _in(SPACE, cps[a]):
+    while left and a < e and _sp(cps[a]):
         a += 1
-    while not left and e > a and _in(SPACE, cps[e - 1]):
+    while not left and e > a and _sp(cps[e - 1]):
         e -= 1
     var out = List[UInt8]()
     for i in range(a, e):
@@ -434,10 +442,17 @@ struct Tokenizer(Movable):
         var out = List[UInt8](capacity=text.byte_length())
         for c in text.codepoints():
             var cp = Int(c)
+            if cp < 128 and self.norm & 1 != 0:  # ASCII fast path: no table lookups
+                if cp == 9 or cp == 10 or cp == 13:
+                    cp = 32
+                elif cp < 32 or cp == 127:
+                    continue
+                out.append(UInt8(cp + 32 if self.norm & 8 != 0 and cp >= 65 and cp <= 90 else cp))
+                continue
             if self.norm & 1 != 0:
                 if cp == 0 or cp == 0xFFFD or (cp != 9 and cp != 10 and cp != 13 and _in(CONTROL, cp)):
                     continue
-                cp = 32 if _in(SPACE, cp) else cp
+                cp = 32 if _sp(cp) else cp
             if self.norm & 2 != 0 and _in(CJK, cp):
                 out.append(32)
                 _put(out, cp)
@@ -463,8 +478,8 @@ struct Tokenizer(Movable):
         var cur = List[UInt8]()
         for c in text.codepoints():
             var cp = Int(c)
-            var punct = _in(PUNCT, cp)
-            if punct or _in(SPACE, cp):
+            var punct = _pu(cp)
+            if punct or _sp(cp):
                 if len(cur) > 0:
                     words.append(String(unsafe_from_utf8=Span(cur)))
                     cur.clear()
@@ -559,7 +574,7 @@ struct Tokenizer(Movable):
         var words = List[String]()
         var cur = List[UInt8]()
         for c in text.codepoints():
-            if _in(SPACE, Int(c)) and self.ws_split:
+            if _sp(Int(c)) and self.ws_split:
                 if len(cur) > 0:
                     words.append(String(unsafe_from_utf8=Span(cur)))
                     cur.clear()
