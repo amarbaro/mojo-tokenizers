@@ -4,4 +4,5 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 command -v uv >/dev/null || { echo "FAIL setup: uv not installed"; exit 1; }
 uv sync || { echo "FAIL setup: uv sync"; exit 1; }
+export MOJO="${MOJO:-.venv/bin/mojo}"
 scripts/check.sh

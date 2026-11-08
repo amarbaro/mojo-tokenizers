@@ -8,7 +8,7 @@ for line in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", 
     if not line.strip() or line.startswith("#"):
         continue
     name, sha, local, url = line.split()
-    src = os.path.expanduser("~/Models/" + local)
+    src = os.path.join(os.path.expanduser("~"), "Models", local)
     data = open(src, "rb").read() if os.path.exists(src) else urllib.request.urlopen(url, timeout=60).read()
     got = hashlib.sha256(data).hexdigest()
     assert got == sha, f"{name}: sha256 {got} != {sha}"
