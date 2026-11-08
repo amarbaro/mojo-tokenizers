@@ -6,7 +6,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p .work
-M=.venv/bin/mojo
+M=${MOJO:-.venv/bin/mojo}
 P=.venv/bin/python
 CASES=${CASES:-.work/cases}
 N=${N:-2000}
