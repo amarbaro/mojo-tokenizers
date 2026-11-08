@@ -1,6 +1,6 @@
 [project]
 name = "mojo-tokenizers"
-version = "0.1.0"
+version = "0.1.1"
 description = "Hugging Face tokenizer.json runtime for Mojo: byte-level BPE (GPT-2, Llama 3, Qwen)"
 license = "Apache-2.0"
 requires-python = ">=3.11,<3.15"
