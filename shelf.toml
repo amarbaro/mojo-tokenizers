@@ -1,0 +1,5 @@
+name = "mojo-tokenizers"
+version = "0.1.1"
+description = "Hugging Face tokenizer.json runtime for Mojo: byte-level BPE (GPT-2, Llama 3, Qwen)"
+tags = ["mojo", "tokenizer", "llm", "nlp"]
+tins = ["mojo-json", "mojo-uregex"]
